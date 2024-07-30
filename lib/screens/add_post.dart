@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:sm/Models/user.dart';
+import 'package:sm/Models/user.dart' as model;
 import 'package:sm/Providers/User_provider.dart';
 import 'package:sm/Resources/firestore_method.dart';
 import 'package:sm/utils/colors.dart';
@@ -114,42 +114,45 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final User user = Provider.of<UserProvider>(context).getUser;
+    model.User user = Provider.of<UserProvider>(context).getUser;
 
     return _file == null
 
         //IF FILE IS NULL THEN ADD BUTTON
-        ? Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () => _selectImage(context),
-                  icon: const Icon(
-                    CupertinoIcons.add_circled,
-                    size: 130,
-                  ),
+        ? MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              backgroundColor: getBackgroundColor(context),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () => _selectImage(context),
+                      icon: const Icon(
+                        color: secondaryColor,
+                        CupertinoIcons.add_circled,
+                        size: 140,
+                      ),
+                    ),
+                    Text(
+                      "Click Add to Post..",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 30,
+                          color: darksecondcolor),
+                    ),
+                  ],
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Text(
-                  "Click Add to Post..",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 30,
-                      color: secondaryColor),
-                ),
-              ],
-            ),
-          )
-
+                //
+              ),
+            ))
         //IF FILE IS SELECTED (POST CAPTION) SCREEN
         : Scaffold(
+            backgroundColor: getBackgroundColor(context),
             //TITLE FOR BACK LEADING AND BLIE COLOR POST BUTTON
             appBar: AppBar(
-              backgroundColor: mobileBackgroundColor,
+              backgroundColor: getBackgroundColor(context),
               leading: IconButton(
                 icon: const Icon(
                   Icons.arrow_back_ios_new_rounded,
@@ -161,9 +164,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
               centerTitle: false,
               actions: [
                 TextButton(
-                  onPressed: () => {},
-                  //postImage(user!.uid, user.profpick, user.profpick),
-                  // postImage(user.uid, user.username, user.profpick),
+                  onPressed: () {
+                    postImage(user.uid, user.username, user.profpick);
+                  },
                   child: const Text(
                     "Post",
                     style: TextStyle(
@@ -175,50 +178,55 @@ class _AddPostScreenState extends State<AddPostScreen> {
               ],
             ),
             //BODY PART FOR POST (CAPTION, POST)
-            body: Column(
-              children: <Widget>[
-                isloading
-                    ? const LinearProgressIndicator()
-                    : const Padding(padding: EdgeInsets.only(top: 0.0)),
-                const Divider(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(""),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.45,
-                      child: TextField(
-                        decoration: const InputDecoration(
-                          hintText: "Write a Caption...",
-                          border: InputBorder.none,
-                        ),
-                        controller: captionCont,
-                        maxLines: 10,
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  isloading
+                      ? const LinearProgressIndicator()
+                      : const Padding(padding: EdgeInsets.only(top: 0.0)),
+                  const Divider(),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(user.profpick),
                       ),
-                    ),
-                    SizedBox(
-                      height: 45,
-                      width: 45,
-                      child: AspectRatio(
-                        aspectRatio: 487 / 451,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: MemoryImage(_file!),
-                              fit: BoxFit.fill,
-                              alignment: FractionalOffset.topCenter,
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.45,
+                        child: TextField(
+                          decoration: const InputDecoration(
+                            hintText: "Write a Caption...",
+                            border: InputBorder.none,
+                          ),
+                          controller: captionCont,
+                          maxLines: 10,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 45,
+                        width: 45,
+                        child: AspectRatio(
+                          aspectRatio: 487 / 451,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: MemoryImage(_file!),
+                                fit: BoxFit.fill,
+                                alignment: FractionalOffset.topCenter,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const Divider(),
-                  ],
-                ),
-              ],
+                      //const Divider(),
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
   }

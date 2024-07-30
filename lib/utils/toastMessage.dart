@@ -1,5 +1,5 @@
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:sm/utils/colors.dart';
 
 class Utils {
   static void toastmessage(String message) {
@@ -8,8 +8,8 @@ class Utils {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 1,
-        backgroundColor: primaryColor,
-        textColor: secondaryColor,
+        backgroundColor: Color.fromARGB(255, 253, 185, 84), // Warning color
+        textColor: Colors.white,
         fontSize: 16.0);
   }
 }

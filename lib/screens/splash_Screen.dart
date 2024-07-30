@@ -12,7 +12,6 @@ class SplashScreen extends StatelessWidget {
   SplashScreen({super.key});
 
   final _auth = FirebaseAuth.instance;
-  //final user = _auth.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +19,10 @@ class SplashScreen extends StatelessWidget {
         backgroundColor: mobileBackgroundColor,
         splash: Column(
           children: [
-            Lottie.asset(
-              'assets/animation/anm.json',
+            Expanded(
+              child: Lottie.asset(
+                'assets/animation/anm.json',
+              ),
             ),
             const Text(
               " M E M O R I E S ",
@@ -37,7 +38,7 @@ class SplashScreen extends StatelessWidget {
                 mobileScreenlayout: MobileScreenLayout(),
                 webScreenlayout: WebScreenlayout())
             : const LoginScreen(),
-        duration: 2500,
+        duration: 200,
         splashIconSize: 400);
   }
 }

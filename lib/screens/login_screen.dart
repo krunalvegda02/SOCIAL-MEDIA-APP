@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sm/Resources/auth_method.dart';
+import 'package:sm/resources/auth_methods.dart';
 import 'package:sm/responsive_layout/mobile_screen.dart';
 import 'package:sm/responsive_layout/responsive_layout_screen.dart';
 import 'package:sm/responsive_layout/web_screen.dart';
 import 'package:sm/screens/sign_up.dart';
 import 'package:sm/utils/colors.dart';
+import 'package:sm/utils/global_variables.dart';
 import 'package:sm/utils/text_form_field.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -39,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (result == "Success") {
 //NAVIGATING SCREEN TO HOMESCREEN
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
+      await Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => const ResponsiveLayoutScreen(
                 mobileScreenlayout: MobileScreenLayout(),
                 webScreenlayout: WebScreenlayout(),
@@ -57,7 +58,10 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+            padding: MediaQuery.of(context).size.width > webScreenSize
+                ? EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width / 3)
+                : const EdgeInsets.symmetric(horizontal: 32),
             width: double.infinity,
             child: Column(
               children: [
@@ -65,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
 //MEMORIES SVG IMAGE
                 SvgPicture.asset(
                   'assets/images/ic_instagram.svg',
-                  color: primaryColor,
+                  color: getTextColor(context),
                   height: 64,
                 ),
                 const SizedBox(
@@ -122,34 +126,38 @@ class _LoginScreenState extends State<LoginScreen> {
                 Flexible(flex: 3, child: Container()),
 
 //TRANSITION TO SIGNIG UP
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: const Text("Don't Have An Account?",
-                          style: TextStyle(fontSize: 15)),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => const SignUpScreen()));
-                      },
-                      child: Container(
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
                         padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: const Text(
-                          "SignUp",
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: blueColor),
-                        ),
+                        child: const Text("Don't Have An Account?",
+                            style: TextStyle(fontSize: 15)),
                       ),
-                    )
-                  ],
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (context) => const SignUpScreen()));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: const Text(
+                            "SignUp",
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: blueColor),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
 //Flexible(flex: 1, child: Container()),
 

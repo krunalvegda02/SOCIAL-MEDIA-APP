@@ -1,9 +1,8 @@
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sm/Resources/auth_method.dart';
+import 'package:sm/resources/auth_methods.dart';
 import 'package:sm/responsive_layout/mobile_screen.dart';
 import 'package:sm/responsive_layout/responsive_layout_screen.dart';
 import 'package:sm/responsive_layout/web_screen.dart';
@@ -11,92 +10,117 @@ import 'package:sm/screens/login_screen.dart';
 import 'package:sm/utils/colors.dart';
 import 'package:sm/utils/imagePick.dart';
 import 'package:sm/utils/text_form_field.dart';
+import 'package:sm/utils/toastMessage.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  const SignUpScreen({Key? key}) : super(key: key);
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  _SignUpScreenState createState() => _SignUpScreenState();
 }
 
+//ALL CONTROLLERS
 class _SignUpScreenState extends State<SignUpScreen> {
-  final TextEditingController _email = TextEditingController();
-  final TextEditingController _Pass = TextEditingController();
-  final TextEditingController _bio = TextEditingController();
-  final TextEditingController _username = TextEditingController();
-  Uint8List? _img;
-  bool isloading = false;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _bioController = TextEditingController();
+  final _usernameController = TextEditingController();
+  Uint8List? _image;
+  bool _isLoading = false;
 
-  void signUpUser() async {
-    setState(() {
-      isloading = true;
-    });
-
-    String result = await AuthMethod().SignUp(
-        bio: _bio.text,
-        email: _email.text,
-        password: _Pass.text,
-        username: _username.text,
-        file: _img!);
-
-    if (result == "Success") {
-//NAVIGATING TO POST SCREEN
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => const ResponsiveLayoutScreen(
-                mobileScreenlayout: MobileScreenLayout(),
-                webScreenlayout: WebScreenlayout(),
-              )));
-    }
-
-    setState(() {
-      isloading = false;
-    });
-  }
-
+//DISPOSE ALL CONTROLLERS
   @override
   void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _bioController.dispose();
+    _usernameController.dispose();
     super.dispose();
-    _email.dispose();
-    _Pass.dispose();
-    _bio.dispose();
-    _username.dispose();
   }
 
-  void selectImage() async {
-    Uint8List img = await pickImage(ImageSource.gallery);
+//SELECT IMAGE
+  Future<void> _selectImage() async {
+    final img = await pickImage(ImageSource.gallery);
     setState(() {
-      _img = img;
+      _image = img;
     });
+  }
+
+//VALIDATOR CHECK
+  Future<void> _signUpUser() async {
+    if (!_validateInputs()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+//SIGNUP METHOD
+    final result = await AuthMethod().SignUp(
+      bio: _bioController.text,
+      email: _emailController.text,
+      password: _passwordController.text,
+      username: _usernameController.text,
+      file: _image!,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+//IF WE SUCCESSFULLY SIGN UP..NAVIGATING TO APP INSIDE
+    if (result == "Success") {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const ResponsiveLayoutScreen(
+            mobileScreenlayout: MobileScreenLayout(),
+            webScreenlayout: WebScreenlayout(),
+          ),
+        ),
+      );
+    } else {
+      Utils.toastmessage("Successfully Login");
+    }
+  }
+
+//VALIDATOR CONDITION
+  bool _validateInputs() {
+    if (_usernameController.text.isEmpty ||
+        _bioController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _image == null) {
+      Utils.toastmessage("Please fill in all fields and select an image.");
+      return false;
+    }
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            width: double.infinity,
+        child: SingleChildScrollView(
+          // Use SingleChildScrollView
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Flexible(flex: 3, child: Container()),
-//MEMORIES SVG IMAGE
+                const SizedBox(height: 40), // Add top padding
                 SvgPicture.asset(
                   'assets/images/ic_instagram.svg',
-                  color: primaryColor,
+                  color: getTextColor(context),
                   height: 64,
                 ),
-                const SizedBox(
-                  height: 50,
-                ),
-
-//CIRCLE AVATAR
+                const SizedBox(height: 40),
                 Stack(
                   children: [
-                    _img != null
+// CIRCLE AVATAR
+                    _image != null
                         ? CircleAvatar(
                             radius: 64,
-                            backgroundImage: MemoryImage(_img!),
+                            backgroundImage: MemoryImage(_image!),
                           )
                         : const CircleAvatar(
                             radius: 64,
@@ -104,59 +128,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 "https://i.pinimg.com/474x/65/25/a0/6525a08f1df98a2e3a545fe2ace4be47.jpg"),
                           ),
                     Positioned(
-                        bottom: -10,
-                        left: 80,
-                        child: IconButton(
-                            onPressed: selectImage,
-                            icon: const Icon(Icons.add_a_photo)))
+                      bottom: -10,
+                      left: 80,
+                      child: IconButton(
+                        onPressed: _selectImage,
+                        icon: const Icon(Icons.add_a_photo),
+                      ),
+                    ),
                   ],
                 ),
-
-                const SizedBox(
-                  height: 24,
-                ),
+                const SizedBox(height: 24),
 //USERNAME
-                text_form_field(
-                    textEditingController: _username,
-                    hintText: "Enter Your Username",
-                    textInputType: TextInputType.text),
-
-                const SizedBox(
-                  height: 24,
+                _buildTextFormField(
+                  controller: _usernameController,
+                  hintText: "Enter Your Username",
                 ),
-
+                const SizedBox(height: 24),
 //BIO
-                text_form_field(
-                    textEditingController: _bio,
-                    hintText: "Enter Your Bio",
-                    textInputType: TextInputType.text),
-
-                const SizedBox(
-                  height: 24,
+                _buildTextFormField(
+                  controller: _bioController,
+                  hintText: "Enter Your Bio",
                 ),
-//EMAIL TEXTFIELD
-                text_form_field(
-                    textEditingController: _email,
-                    hintText: "Enter Your Email",
-                    textInputType: TextInputType.text),
-
-                const SizedBox(
-                  height: 24,
+                const SizedBox(height: 24),
+//EMAIL
+                _buildTextFormField(
+                  controller: _emailController,
+                  hintText: "Enter Your Email",
                 ),
-
-//PASSWORD TEXTFIELD
-                text_form_field(
-                    textEditingController: _Pass,
-                    hintText: "Enter Your Password",
-                    textInputType: TextInputType.text,
-                    isPassword: true),
-
-                const SizedBox(
-                  height: 24,
+                const SizedBox(height: 24),
+//PASWWORD
+                _buildTextFormField(
+                  controller: _passwordController,
+                  hintText: "Enter Your Password",
+                  isPassword: true,
                 ),
-//SIGN UP BUTTON
+                const SizedBox(height: 24),
                 InkWell(
-                  onTap: signUpUser,
+                  /*ONTAP EVENT*/ onTap: _signUpUser,
                   child: Container(
                     height: 45,
                     width: double.infinity,
@@ -165,60 +173,61 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       borderRadius: BorderRadius.circular(5),
                       color: blueColor,
                     ),
-                    child: isloading
+                    child: _isLoading
                         ? const CircularProgressIndicator(
                             color: primaryColor,
                           )
                         : const Text(
-                            "Sign UP",
+                            "Sign Up",
                             style: TextStyle(fontSize: 18),
                           ),
                   ),
                 ),
-
-                const SizedBox(
-                  height: 24,
-                ),
-
-                Flexible(flex: 3, child: Container()),
-//TRANSITION TO SIGNIG UP
+                const SizedBox(height: 24),
+//LOG IN TRANSITIONIGN
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: const Text("Already Have An Account?",
-                          style: TextStyle(fontSize: 15)),
+                    const Text(
+                      "Already Have An Account?",
+                      style: TextStyle(fontSize: 15),
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
+                    const SizedBox(width: 10),
                     InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => const LoginScreen()));
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: const Text(
-                          "Log In",
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: blueColor),
+                      onTap: () => Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
                         ),
                       ),
-                    )
+                      child: const Text(
+                        "Log In",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: blueColor,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-
-//FORGOT PASSWORD
               ],
             ),
           ),
         ),
       ),
-      resizeToAvoidBottomInset: false,
+    );
+  }
+
+  Widget _buildTextFormField({
+    required TextEditingController controller,
+    required String hintText,
+    bool isPassword = false,
+  }) {
+    return text_form_field(
+      textEditingController: controller,
+      hintText: hintText,
+      textInputType: TextInputType.text,
+      isPassword: isPassword,
     );
   }
 }

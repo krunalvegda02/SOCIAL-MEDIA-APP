@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:sm/Providers/User_provider.dart';
+import 'package:sm/Providers/theme_provider.dart';
 import 'package:sm/screens/splash_Screen.dart';
-import 'package:sm/utils/colors.dart';
-
 import 'firebase_options.dart';
 
 void main() async {
@@ -12,6 +11,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  //debugPaintSizeEnabled = true;
   runApp(const MyApp());
 }
 
@@ -23,19 +23,35 @@ class MyApp extends StatelessWidget {
 //PROVIDER INITIALIZED
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (context) => UserProvider(),
-        )
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeChanger()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData.dark().copyWith(
-          scaffoldBackgroundColor: mobileBackgroundColor,
-        ),
-        title: 'Instagram Clone',
-        home: SplashScreen(),
+      child: Builder(
+        builder: (BuildContext context) {
+          final _themeChanger = Provider.of<ThemeChanger>(context);
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            themeMode: _themeChanger.themeMode,
+            theme: ThemeData(
+              brightness: Brightness.light,
+            ),
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+            ),
+            title: 'SocialMedia App',
+            home: SplashScreen(),
+          );
+        },
+      ),
+    );
+  }
+}
 
-        // StreamBuilder(
+
+
+
+
+       // StreamBuilder(
         //   stream: FirebaseAuth.instance.authStateChanges(),
         //   builder: (context, snapshot) {
         //     if (snapshot.connectionState == ConnectionState.active) {
@@ -61,7 +77,3 @@ class MyApp extends StatelessWidget {
         //     return const LoginScreen();
         //   },
         // ),
-      ),
-    );
-  }
-}
