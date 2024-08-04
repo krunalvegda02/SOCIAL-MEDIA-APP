@@ -113,13 +113,47 @@ class AuthMethod {
   Future<void> signOut() async {
     await _auth.signOut();
 
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user == null) {
-        print('User is currently signed out!');
-      } else {
-        print('User is signed in!');
-        var currUser = FirebaseAuth.instance.currentUser!.uid;
-      }
-    });
+    FirebaseAuth.instance.authStateChanges().listen(
+      (User? user) {
+        if (user == null) {
+          print('User is currently signed out!');
+        } else {
+          print('User is signed in!');
+        }
+      },
+    );
   }
+
+//EDIT PROFILE
+  // Future<void> EditProfile({
+  //   String? email,
+  //   String? username,
+  //   String? bio,
+  //   Uint8List? profpick,
+  // }) async {
+  //   try {
+  //     //UPDATE IF EMAIL IS NOT EMPTY
+  //     if (email != null && email.isNotEmpty) {
+  //       await _auth.currentUser!.updateEmail(email);
+  //     }
+
+  //     //UPDATE IF USERNAME IS NOT EMPTY
+  //     if (username != null && username.isNotEmpty) {
+  //        await _auth.currentUser!.UPDA;
+  //     }
+
+  //     //UPDATE IF BIO IS NOT EMPTY
+  //     if (bio != null && bio.isNotEmpty) {
+  //       data['bio'] = bio;
+  //     }
+  //   } catch (e) {
+  //     Utils.toastmessage(e.toString());
+  //   }
+  // }
+
+
+ 
+
+//FORGOT PASSWORD
+  
 }

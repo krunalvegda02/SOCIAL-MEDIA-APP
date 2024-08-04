@@ -98,7 +98,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      //resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
           // Use SingleChildScrollView
@@ -138,18 +138,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-//USERNAME
-                _buildTextFormField(
-                  controller: _usernameController,
-                  hintText: "Enter Your Username",
-                ),
-                const SizedBox(height: 24),
-//BIO
-                _buildTextFormField(
-                  controller: _bioController,
-                  hintText: "Enter Your Bio",
-                ),
-                const SizedBox(height: 24),
+
 //EMAIL
                 _buildTextFormField(
                   controller: _emailController,
@@ -161,6 +150,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: _passwordController,
                   hintText: "Enter Your Password",
                   isPassword: true,
+                ),
+                const SizedBox(height: 24),
+//USERNAME
+                _buildTextFormField(
+                  controller: _usernameController,
+                  hintText: "Enter Your Username",
+                ),
+                const SizedBox(height: 24),
+
+//BIO
+                TextField(
+                  maxLines: null,
+                  cursorColor: getTextColor(context),
+                  maxLength: 200,
+                  keyboardType: TextInputType.multiline,
+                  controller: _bioController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderSide: Divider.createBorderSide(context)),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: Divider.createBorderSide(context)),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: Divider.createBorderSide(context)),
+                    filled: true,
+                    contentPadding: EdgeInsets.all(9),
+                    hintText: "Enter Your Bio",
+                  ),
                 ),
                 const SizedBox(height: 24),
                 InkWell(
@@ -184,6 +200,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+
 //LOG IN TRANSITIONIGN
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

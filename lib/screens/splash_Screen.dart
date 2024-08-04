@@ -19,10 +19,8 @@ class SplashScreen extends StatelessWidget {
         backgroundColor: mobileBackgroundColor,
         splash: Column(
           children: [
-            Expanded(
-              child: Lottie.asset(
-                'assets/animation/anm.json',
-              ),
+            Lottie.asset(
+              'assets/animation/anm.json',
             ),
             const Text(
               " M E M O R I E S ",

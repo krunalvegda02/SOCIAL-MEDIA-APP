@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:sm/Resources/auth_methods.dart';
 import 'package:sm/Resources/firestore_method.dart';
 import 'package:sm/screens/add_post.dart';
+import 'package:sm/screens/edit_profile.dart';
 import 'package:sm/screens/login_screen.dart';
+import 'package:sm/screens/user_Profile_post.dart';
 import 'package:sm/utils/colors.dart';
 import 'package:sm/utils/follow_button.dart';
-import 'package:sm/utils/post_card.dart';
 import 'package:sm/utils/theme_screen.dart';
 import 'package:sm/utils/toastMessage.dart';
 
@@ -83,28 +84,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     size: 32,
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    userData["username"],
-                    style: const TextStyle(fontWeight: FontWeight.w400),
+                  Expanded(
+                    child: Text(
+                      userData["username"],
+                      style: const TextStyle(fontWeight: FontWeight.w400),
+                    ),
                   ),
                 ],
               ),
-
-              // actions: [
-              //   IconButton(
-              //     onPressed: () {
-              //       Navigator.of(context).push(
-              //         MaterialPageRoute(
-              //           builder: (context) => const themeScreen(),
-              //         ),
-              //       );
-              //     },
-              //     icon: const Icon(
-              //       CupertinoIcons.brightness_solid,
-              //       size: 32,
-              //     ),
-              //   ),
-              // ],
             ),
             endDrawer: Drawer(
               backgroundColor: getBackgroundColor(context),
@@ -139,6 +126,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             );
                           },
                         ),
+                        ListTile(
+                          title: const Text(
+                            "Your Activity",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const themeScreen(),
+                              ),
+                            );
+                          },
+                        ),
                         Align(
                           alignment: Alignment.bottomLeft,
                           child: ListTile(
@@ -157,22 +157,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ],
                     ),
-
-                    // Column(
-                    //   children: [
-                    //     Flexible(flex: 3, child: Container()),
-                    //     const Text("Theme Data"),
-                    //     TextButton(
-                    //         onPressed: () async {
-                    //           await AuthMethod().signOut();
-                    //           Navigator.of(context).pushReplacement(
-                    //               MaterialPageRoute(
-                    //                   builder: (context) =>
-                    //                       const LoginScreen()));
-                    //         },
-                    //         child: const Text("Sign Out"))
-                    //   ],
-                    // )
                   ],
                 ),
               ),
@@ -201,68 +185,75 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
                                   children: [
-                                    buildStatColumn(
-                                        postCounter, "Posts", () {}),
-                                    buildStatColumn(
-                                        followers, "Followers", () {}),
-                                    buildStatColumn(
-                                        following, "Following", () {}),
+                                    Expanded(
+                                      child: buildStatColumn(
+                                          postCounter, "Posts", () {}),
+                                    ),
+                                    Expanded(
+                                      child: buildStatColumn(
+                                          following, "Following", () {}),
+                                    ),
+                                    Expanded(
+                                      child: buildStatColumn(
+                                          followers, "Followers", () {}),
+                                    ),
                                   ],
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    currUser == widget.uid
+                                currUser == widget.uid
+                                    ? FollowButton(
+                                        () {},
+                                        function: () {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      EditProfile(
+                                                          uid: currUser)));
+                                        },
+                                        text: "Edit Profile",
+                                        backGroundColor:
+                                            getBackgroundColor(context),
+                                        textColor: getTextColor(context),
+                                        borderColor: Colors.grey,
+                                      )
+                                    : isFollowing
                                         ? FollowButton(
-                                            text: "Edit Profile",
+                                            () {},
+                                            text: "Unfollow",
                                             backGroundColor:
                                                 getBackgroundColor(context),
                                             textColor: getTextColor(context),
                                             borderColor: Colors.grey,
-                                            function: () {},
+                                            function: () async {
+                                              FirestoreMethod().followUser(
+                                                  FirebaseAuth.instance
+                                                      .currentUser!.uid,
+                                                  userData["uid"]);
+
+                                              setState(() {
+                                                isFollowing = false;
+
+                                                followers--;
+                                              });
+                                            },
                                           )
-                                        : isFollowing
-                                            ? FollowButton(
-                                                text: "Unfollow",
-                                                backGroundColor:
-                                                    getBackgroundColor(context),
-                                                textColor:
-                                                    getTextColor(context),
-                                                borderColor: Colors.grey,
-                                                function: () async {
-                                                  FirestoreMethod().followUser(
-                                                      FirebaseAuth.instance
-                                                          .currentUser!.uid,
-                                                      userData["uid"]);
+                                        : FollowButton(
+                                            () {},
+                                            text: "Follow",
+                                            backGroundColor: blueColor,
+                                            textColor: getTextColor(context),
+                                            borderColor: Colors.blue,
+                                            function: () async {
+                                              FirestoreMethod().followUser(
+                                                  FirebaseAuth.instance
+                                                      .currentUser!.uid,
+                                                  userData["uid"]);
 
-                                                  setState(() {
-                                                    isFollowing = false;
-
-                                                    followers--;
-                                                  });
-                                                },
-                                              )
-                                            : FollowButton(
-                                                text: "Follow",
-                                                backGroundColor: blueColor,
-                                                textColor:
-                                                    getTextColor(context),
-                                                borderColor: Colors.blue,
-                                                function: () async {
-                                                  FirestoreMethod().followUser(
-                                                      FirebaseAuth.instance
-                                                          .currentUser!.uid,
-                                                      userData["uid"]);
-
-                                                  setState(() {
-                                                    isFollowing = true;
-                                                    followers++;
-                                                  });
-                                                },
-                                              )
-                                  ],
-                                )
+                                              setState(() {
+                                                isFollowing = true;
+                                                followers++;
+                                              });
+                                            },
+                                          )
                               ],
                             ),
                           ),
@@ -366,9 +357,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: secondaryColor,
                                     size: 100,
                                   ),
-                                  // const SizedBox(
-                                  //   height: 5,
-                                  // ),
                                   Text(
                                     "No Post",
                                     style: TextStyle(
@@ -395,10 +383,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           return InkWell(
                             onTap: () {
-                              Navigator.of(context).pop(MaterialPageRoute(
-                                  builder: (context) => PostCard(
-                                        snap: snap["posts"].docs().data(),
-                                      )));
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      ProfilePost(uid: widget.uid)));
                             },
                             child: Image(
                               image: NetworkImage(snap["postUrl"]),
@@ -413,6 +400,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
   }
 
+// 3 COLUMNS OF FOLLOWING FOLLOWERS AND POST
   Column buildStatColumn(int num, String label, Function? function) {
     return Column(
       mainAxisSize: MainAxisSize.min,

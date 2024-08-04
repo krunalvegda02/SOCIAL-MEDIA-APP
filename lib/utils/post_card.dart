@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:sm/Models/user.dart';
+import 'package:sm/Models/user.dart' as model;
 import 'package:sm/Providers/User_provider.dart';
 import 'package:sm/Resources/firestore_method.dart';
 import 'package:sm/screens/comment_screen.dart';
@@ -14,7 +15,7 @@ import 'package:sm/utils/like_animation.dart';
 import 'package:sm/utils/toastMessage.dart';
 
 class PostCard extends StatefulWidget {
-  final snap;
+  final dynamic snap;
 
   const PostCard({super.key, required this.snap});
 
@@ -24,6 +25,7 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   bool isLikeAnimating = false;
+
   int commentLen = 0;
 
   @override
@@ -49,7 +51,7 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    final User user = Provider.of<UserProvider>(context).getUser;
+    final model.User user = Provider.of<UserProvider>(context).getUser;
 
     return Container(
       color: getBackgroundColor(context),
@@ -92,50 +94,54 @@ class _PostCardState extends State<PostCard> {
                   ),
                 ),
                 Expanded(
-                  flex: -2,
-                  child: IconButton(
-                    onPressed: () {
+                    flex: -2,
+                    child: (widget.snap['uid'] ==
+                            FirebaseAuth.instance.currentUser!.uid)
+                        ? IconButton(
+                            onPressed: () {
 // SHOW DIALOG BOX ON ONPRESS EVENT OF ICONBUTTON CLICK
-                      showDialog(
-                        context: context,
-                        builder: (context) => Dialog(
-                          alignment: AlignmentDirectional.center,
-                          child: ListView(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 7,
-                              ),
-                              shrinkWrap: true,
-                              children: [
-                                "Delete",
-                              ]
-/* WE MAP EACH CONTENT OF LISTVIEW AND WRAP IT WITH INKWELL */
-                                  .map(
-                                    (e) => InkWell(
-                                      onTap: () async {
-                                        FirestoreMethod()
-                                            .deletePost(widget.snap["postId"]);
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                          horizontal: 16,
-                                        ),
-                                        child: Text(e),
+                              showDialog(
+                                context: context,
+                                builder: (context) => Dialog(
+                                  alignment: AlignmentDirectional.center,
+                                  child: ListView(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 7,
                                       ),
-                                    ),
-                                  )
-                                  .toList()),
-                        ),
-                      );
-                    }, //ONPRESS EVENT COMPLETE
+                                      shrinkWrap: true,
+                                      children: [
+                                        "Delete",
+                                      ]
+/* WE MAP EACH CONTENT OF LISTVIEW AND WRAP IT WITH INKWELL */
+                                          .map(
+                                            (e) => InkWell(
+                                              onTap: () async {
+                                                FirestoreMethod().deletePost(
+                                                    widget.snap["postId"]);
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  vertical: 12,
+                                                  horizontal: 16,
+                                                ),
+                                                child: Text(e),
+                                              ),
+                                            ),
+                                          )
+                                          .toList()),
+                                ),
+                              );
+                            }, //ONPRESS EVENT COMPLETE
 
 //  SHOW DIALOG ONPRESS EVENT COMPLETE AND CHILE OF ICONBUTTON
-                    icon: const Icon(
-                      CupertinoIcons.ellipsis_vertical,
-                    ),
-                  ),
-                ),
+                            icon: const Icon(
+                              CupertinoIcons.ellipsis_vertical,
+                            ),
+                          )
+                        //IF NOT CURR USER POST THEN IT WILL SHOW NOTHING THERE
+                        : Text("")),
               ],
             ),
           ),
@@ -145,9 +151,11 @@ class _PostCardState extends State<PostCard> {
             onDoubleTap: () async {
               await FirestoreMethod().likePost(
                   widget.snap["postId"], user.uid, widget.snap["likes"]);
-              setState(() {
-                isLikeAnimating = true;
-              });
+              if (widget.snap["likes"]!.contains(user.uid)) {
+                setState(() {
+                  isLikeAnimating = true;
+                });
+              }
             },
             child: Stack(
               children: [
@@ -166,7 +174,7 @@ class _PostCardState extends State<PostCard> {
                     opacity: isLikeAnimating ? 1 : 0,
                     child: LikeAnimation(
                       isAnimating: isLikeAnimating,
-                      duration: const Duration(milliseconds: 340),
+                      duration: const Duration(milliseconds: 300),
                       onEnd: () {
                         setState(() {
                           isLikeAnimating = false;
@@ -271,7 +279,10 @@ class _PostCardState extends State<PostCard> {
                   child: Text(
                     '${widget.snap['likes'].length} likes',
                     style: const TextStyle(
-                        fontSize: 19, fontWeight: FontWeight.w400),
+                      fontSize: 19,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
                 Container(

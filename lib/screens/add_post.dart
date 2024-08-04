@@ -37,6 +37,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       if (result == "success") {
         setState(() {
           isloading = false;
+          captionCont.clear();
         });
         Utils.toastmessage("Posted Successfully");
         clearImage();
@@ -124,25 +125,27 @@ class _AddPostScreenState extends State<AddPostScreen> {
             home: Scaffold(
               backgroundColor: getBackgroundColor(context),
               body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () => _selectImage(context),
-                      icon: const Icon(
-                        color: secondaryColor,
-                        CupertinoIcons.add_circled,
-                        size: 140,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () => _selectImage(context),
+                        icon: const Icon(
+                          color: secondaryColor,
+                          CupertinoIcons.add_circled,
+                          size: 140,
+                        ),
                       ),
-                    ),
-                    Text(
-                      "Click Add to Post..",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 30,
-                          color: darksecondcolor),
-                    ),
-                  ],
+                      Text(
+                        "Click Add to Post..",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 30,
+                            color: darksecondcolor),
+                      ),
+                    ],
+                  ),
                 ),
                 //
               ),
@@ -179,53 +182,56 @@ class _AddPostScreenState extends State<AddPostScreen> {
             ),
             //BODY PART FOR POST (CAPTION, POST)
             body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  isloading
-                      ? const LinearProgressIndicator()
-                      : const Padding(padding: EdgeInsets.only(top: 0.0)),
-                  const Divider(),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: NetworkImage(user.profpick),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.45,
-                        child: TextField(
-                          decoration: const InputDecoration(
-                            hintText: "Write a Caption...",
-                            border: InputBorder.none,
-                          ),
-                          controller: captionCont,
-                          maxLines: 10,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    isloading
+                        ? const LinearProgressIndicator()
+                        : const Padding(padding: EdgeInsets.only(top: 0.0)),
+                    const Divider(),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(user.profpick),
                         ),
-                      ),
-                      SizedBox(
-                        height: 45,
-                        width: 45,
-                        child: AspectRatio(
-                          aspectRatio: 487 / 451,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: MemoryImage(_file!),
-                                fit: BoxFit.fill,
-                                alignment: FractionalOffset.topCenter,
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.45,
+                          child: TextField(
+                            decoration: const InputDecoration(
+                              hintText: "Write a Caption...",
+                              border: InputBorder.none,
+                            ),
+                            controller: captionCont,
+                            maxLines: 10,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 45,
+                          width: 45,
+                          child: AspectRatio(
+                            aspectRatio: 487 / 451,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: MemoryImage(_file!),
+                                  fit: BoxFit.fill,
+                                  alignment: FractionalOffset.topCenter,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      //const Divider(),
-                    ],
-                  ),
-                ],
+                        //const Divider(),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           );

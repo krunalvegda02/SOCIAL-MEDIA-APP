@@ -4,6 +4,7 @@ import 'package:sm/resources/auth_methods.dart';
 import 'package:sm/responsive_layout/mobile_screen.dart';
 import 'package:sm/responsive_layout/responsive_layout_screen.dart';
 import 'package:sm/responsive_layout/web_screen.dart';
+import 'package:sm/screens/Change_password.dart';
 import 'package:sm/screens/sign_up.dart';
 import 'package:sm/utils/colors.dart';
 import 'package:sm/utils/global_variables.dart';
@@ -122,6 +123,23 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(
                   height: 24,
                 ),
+                //FORGOT PASSWORD
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => const ForgotPasword()));
+                  },
+                  child: const Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Change Pasword ?",
+                      style: TextStyle(
+                        color: blueColor,
+                        fontSize: 17,
+                      ),
+                    ),
+                  ),
+                ),
 
                 Flexible(flex: 3, child: Container()),
 
@@ -160,8 +178,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 //Flexible(flex: 1, child: Container()),
-
-//FORGOT PASSWORD
               ],
             ),
           ),

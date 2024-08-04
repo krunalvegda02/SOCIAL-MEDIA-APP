@@ -6,7 +6,7 @@ class FollowButton extends StatelessWidget {
   final Color textColor;
   final Color backGroundColor;
   final String text;
-  const FollowButton(
+  const FollowButton(Null Function() param0, 
       {super.key,
       required this.borderColor,
       required this.function,
